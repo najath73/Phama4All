@@ -5,6 +5,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useAuth } from '../hooks/authContext';
 import TopBar1 from '../components/topbar1';
 import TopBar2 from '../components/topbar2';
+import { useNavigate } from 'react-router-dom'; // Ajout de l'import
 
 const styles = {
   card: {
@@ -34,12 +35,13 @@ const styles = {
 };
 
 const UserDetailPage = () => {
-  const { user } = useAuth(); // Récupérer l'utilisateur connecté via useAuth
+  const { user } = useAuth(); 
+  const navigate = useNavigate(); // Initialiser navigate
 
   if (!user) return <Typography>Aucun utilisateur trouvé.</Typography>;
 
   const handleEditClick = () => {
-    // Logique pour rediriger vers une page de modification ou ouvrir une modal
+    navigate(`/update-user/${user.id}`); // Utilisation de l'ID réel de l'utilisateur
     console.log('Modifier les informations utilisateur');
   };
 

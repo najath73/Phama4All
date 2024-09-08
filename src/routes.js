@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, Navigate} from 'react-router-dom';
+import { Route, Routes} from 'react-router-dom';
 
 import HomePage from './pages/homePage';
 import AllPharmacies from './pages/listPharmaciesPage'
@@ -9,6 +9,7 @@ import SignupPage from './pages/registerPage'
 import UserDetailPage from './pages/userDetails'
 import PharmacyDetailPage from './pages/detaiPharmacyPage'
 import OrdersList from './pages/orders'
+import UpdateUser from './pages/updateUser'
 
 
 const AppRoutes = ()=> {
@@ -24,6 +25,7 @@ const AppRoutes = ()=> {
       <Route path="/users/:id" element={<UserDetailPage />} />
       <Route path="/pharmacy/:id" element={<PharmacyDetailPage />} />
       <Route path="/user-orders" element={<OrdersList />} />
+      <Route path="/update-user/:id" element={<UpdateUser />} />
 
 
    
