@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Chip } from '@mui/material';
-import axios from 'axios';
 import TopBar1 from '../components/topbar1';
 import TopBar2 from '../components/topbar2';
 import { useAuth } from '../hooks/authContext'; 
+import api from '../utils/api';
 
 // Composant pour afficher le statut de la commande avec des couleurs spécifiques
 const StatusChip = ({ status }) => {
@@ -39,11 +39,15 @@ const OrdersList = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        const { token } = user
         // Récupère toutes les commandes depuis l'API
-        const response = await axios.get('https://back-pharmacie.onrender.com/orders');
-        // Filtre les commandes pour ne garder que celles de l'utilisateur connecté
-        const userOrders = response.data.filter(order => order.user === user.id);
-        setOrders(userOrders);
+        const response = await api.get('/orders/users', {
+          headers: {
+            Authorization: `Bearer ${token}`
+       }});
+    
+        setOrders(response.data);
+        console.log(orders)
       } catch (error) {
         console.error('Erreur lors du chargement des commandes:', error);
       }
