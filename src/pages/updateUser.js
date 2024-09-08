@@ -5,7 +5,7 @@ import { TextField, Button, Box, Typography, Container, Card, CardContent, Grid 
 import { useAuth } from '../hooks/authContext';
 
 const UpdateUser = () => {
-  const { id } = useAuth(); // Assurez-vous que cela récupère bien l'ID de l'utilisateur connecté
+  const { user } = useAuth(); // Assurez-vous que cela récupère bien l'ID de l'utilisateur connecté
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     username: '',
@@ -19,7 +19,8 @@ const UpdateUser = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await api.get(`/users/${id}/`);
+        console.log(user.id)
+        const response = await api.get(`/users/${user.id}/`);
         const { username, name, firstname, email, roles } = response.data;
         setUserData({ username, name, firstname, email, roles });
       } catch (error) {
@@ -28,7 +29,7 @@ const UpdateUser = () => {
     };
 
     fetchUserData();
-  }, [id]);
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,7 +40,7 @@ const UpdateUser = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await api.patch(`/users/${id}/`, userData, {
+      await api.patch(`/users/${user.id}/`, userData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
