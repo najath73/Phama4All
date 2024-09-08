@@ -49,9 +49,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+
+
+
+
 const TopBar1 = () => {
   const navigate = useNavigate();
   const { logout } = useAuth(); // Utiliser le contexte d'authentification
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <AppBar position="static" style={{ backgroundColor: '#F9F9F9' }}>
@@ -74,11 +83,18 @@ const TopBar1 = () => {
           </Search>
         </div>
         <Button
-          color="inherit"
-          onClick={logout} // Assurez-vous que la fonction logout est définie dans votre contexte
-          sx={{ ml: 2 }} // Ajout d'un espacement à gauche pour le bouton
-        >
-          Déconnexion
+            onClick={handleLogout}
+            sx={{
+                ml: 2,
+                color: '#000',  // Couleur du texte par défaut (noir)
+                backgroundColor: 'transparent',  // Pas de fond
+                '&:hover': {
+                color: '#555',  // Le texte devient légèrement plus foncé au survol
+                backgroundColor: 'transparent',  // Garde le fond transparent au survol
+                },
+            }}
+            >
+            Déconnexion
         </Button>
 
         {/* Icône utilisateur */}
