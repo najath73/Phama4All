@@ -9,7 +9,7 @@ const TopBar2 = () => {
     <AppBar position="static" style={{ backgroundColor: '#A0D6B4' }}>  {/* Vert mousse teinte 2 */}
       <Toolbar style={{ justifyContent: 'left' }}>
         <Button color="inherit" onClick={() => navigate('/all-pharmacies')}>Toutes les pharmacies</Button>
-        <Button color="inherit" onClick={() => navigate('/orders')}>Mes commandes</Button>
+        <Button color="inherit" onClick={() => navigate('/user-orders')}>Mes commandes</Button>
         {/* Ajouter d'autres menus selon les besoins */}
       </Toolbar>
     </AppBar>

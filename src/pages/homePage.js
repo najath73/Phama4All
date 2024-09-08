@@ -1,17 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Grid, Card, CardContent, Typography, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MyLocationIcon from '@mui/icons-material/MyLocation'; // Importer l'icône pour recentrer sur la position
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
 import TopBar1 from '../components/topbar1';
 import TopBar2 from '../components/topbar2';
 import axios from 'axios';
+import L from 'leaflet';
+import userIconImage from '../placeholder.png'; // Remplacez par le chemin réel de l'image de l'icône utilisateur
+import pharmacyIconImage from '../marker.png'; // Remplacez par le chemin réel de l'image de l'icône pharmacie
 
 const HomePage = () => {
   const [pharmacies, setPharmacies] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedPharmacy, setSelectedPharmacy] = useState(null); // Ajout de l'état selectedPharmacy
+  const [selectedPharmacy, setSelectedPharmacy] = useState(null);
+  const [userPosition, setUserPosition] = useState(null);
+  const mapRef = useRef(null); // Référence pour accéder à la carte
   const navigate = useNavigate(); 
 
   // Récupération des pharmacies via l'API
@@ -28,6 +34,56 @@ const HomePage = () => {
     fetchPharmacies();
   }, []);
 
+  // Récupération de la position actuelle de l'utilisateur
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserPosition([latitude, longitude]);
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération de la position:', error);
+      },
+      { enableHighAccuracy: true }
+    );
+  }, []);
+
+  // Icône personnalisée pour la position de l'utilisateur avec texte "Vous êtes ici"
+  const userIcon = L.divIcon({
+    className: 'custom-user-icon',
+    html: `
+      <div style="display: flex; align-items: center;">
+        <img src="${userIconImage}" style="width: 38px; height: 38px;" />
+        <span style="margin-left: 5px; background-color: white; padding: 2px;">Vous êtes ici</span>
+      </div>
+    `,
+    iconSize: [38, 38],
+    iconAnchor: [19, 38],
+    popupAnchor: [0, -38],
+  });
+
+  // Icône personnalisée pour les pharmacies avec nom à côté
+  const createPharmacyIcon = (pharmacyName) =>
+    L.divIcon({
+      className: 'custom-pharmacy-icon',
+      html: `
+        <div style="display: flex; align-items: center;">
+          <img src="${pharmacyIconImage}" style="width: 38px; height: 38px;" />
+          <span style="margin-left: 5px; background-color: white; padding: 2px;">${pharmacyName}</span>
+        </div>
+      `,
+      iconSize: [38, 38],
+      iconAnchor: [19, 38],
+      popupAnchor: [0, -38],
+    });
+
+  // Fonction pour recentrer la carte sur la position actuelle de l'utilisateur
+  const handleCenterOnUser = () => {
+    if (userPosition && mapRef.current) {
+      mapRef.current.flyTo(userPosition, 13); // Recentre la carte sur la position actuelle avec un niveau de zoom de 13
+    }
+  };
+
   // Ouverture du menu pour une pharmacie spécifique
   const handleMenuOpen = (event, pharmacy) => {
     setAnchorEl(event.currentTarget);
@@ -41,56 +97,79 @@ const HomePage = () => {
 
   // Navigation vers la liste des produits
   const handleViewProducts = (pharmacyId) => {
-    navigate(`/${pharmacyId}/list-product`); // Utilisation correcte de l'ID de la pharmacie dans l'URL
+    navigate(`/${pharmacyId}/list-product`);
   };
 
   // Navigation vers les détails de la pharmacie
   const handleViewDetails = () => {
     if (selectedPharmacy) {
-      navigate(`/pharmacy/${selectedPharmacy._id}`); // Utilisation de navigate pour rediriger vers la page des détails
+      navigate(`/pharmacy/${selectedPharmacy._id}`);
     }
   };
 
   // Style de la carte
   const mapContainerStyle = {
-    height: '400px',
+    height: '100vh',
     width: '100%',
+    position: 'relative',
+  };
+
+  // Style de l'icône flottante
+  const iconStyle = {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    zIndex: 1000,
+    backgroundColor: 'white',
+    borderRadius: '50%',
+    padding: '5px',
   };
 
   return (
     <div style={{ fontFamily: 'Roboto Thin, sans-serif' }}>
-      {/* Premier TopBar (logo, recherche, icône utilisateur) */}
       <TopBar1 />
-
-      {/* Deuxième TopBar (menu) */}
       <TopBar2 />
-
-      {/* Espacement entre la navbar et la carte */}
       <div style={{ marginTop: '20px' }}></div>
-
       <Grid container>
-        {/* Carte Leaflet avec OpenStreetMap */}
-        <Grid item xs={8}>
-          <MapContainer center={[51.505, -0.09]} zoom={13} style={mapContainerStyle}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
-            />
-            {pharmacies.map((pharmacy, index) => (
-              <Marker
-                key={index}
-                position={[pharmacy.localisation.latitude, pharmacy.localisation.longitude]}
+        <Grid item xs={8} style={{ position: 'relative' }}>
+          {userPosition ? (
+            <>
+              <MapContainer center={userPosition} zoom={13} style={mapContainerStyle} ref={mapRef}>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution="&copy; OpenStreetMap contributors"
+                />
+                {/* Marqueur de la position de l'utilisateur avec texte et icône personnalisée */}
+                <Marker position={userPosition} icon={userIcon}>
+                  <Popup>Vous êtes ici</Popup>
+                </Marker>
+                {pharmacies.map((pharmacy, index) => (
+                  <Marker
+                    key={index}
+                    position={[pharmacy.localisation.latitude, pharmacy.localisation.longitude]}
+                    icon={createPharmacyIcon(pharmacy.name)}
+                  >
+                    <Popup>
+                      {pharmacy.name}<br />
+                      {pharmacy.address}
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+              {/* Icône flottante pour recentrer la carte */}
+              <IconButton
+                onClick={handleCenterOnUser}
+                style={iconStyle}
+                color="primary"
               >
-                <Popup>
-                  {pharmacy.name}<br />
-                  {pharmacy.address}
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+                <MyLocationIcon />
+              </IconButton>
+            </>
+          ) : (
+            <p>Chargement de votre position...</p>
+          )}
         </Grid>
 
-        {/* Liste des pharmacies cliquables avec un menu pour chaque */}
         <Grid item xs={4} style={{ padding: '10px' }}>
           {pharmacies.map((pharmacy, index) => (
             <Card key={index} style={{ marginBottom: '10px' }}>
@@ -98,8 +177,6 @@ const HomePage = () => {
                 <Typography variant="h6">{pharmacy.name}</Typography>
                 <Typography variant="body2">{pharmacy.address}</Typography>
                 <Typography variant="body2">{pharmacy.phone}</Typography>
-
-                {/* Icone du menu */}
                 <IconButton
                   aria-label="more"
                   aria-controls={`menu-${index}`}
@@ -108,8 +185,6 @@ const HomePage = () => {
                 >
                   <MoreVertIcon />
                 </IconButton>
-
-                {/* Menu déroulant pour chaque pharmacie */}
                 <Menu
                   id={`menu-${index}`}
                   anchorEl={anchorEl}
