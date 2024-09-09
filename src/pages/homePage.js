@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Grid, Card, CardContent, Typography, IconButton, Menu, MenuItem } from '@mui/material';
+import { Grid, CardContent, Typography, IconButton, Menu, MenuItem, Button, Box } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MyLocationIcon from '@mui/icons-material/MyLocation'; // Importer l'icône pour recentrer sur la position
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
 import TopBar1 from '../components/topbar1';
-import axios from 'axios';
 import L from 'leaflet';
 import userIconImage from '../placeholder.png'; // Remplacez par le chemin réel de l'image de l'icône utilisateur
 import pharmacyIconImage from '../marker.png'; // Remplacez par le chemin réel de l'image de l'icône pharmacie
+import api from '../utils/api';
 
 const HomePage = () => {
   const [pharmacies, setPharmacies] = useState([]);
@@ -23,7 +23,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchPharmacies = async () => {
       try {
-        const response = await axios.get('https://back-pharmacie.onrender.com/pharmacies');
+        const response = await api.get('/pharmacies');
         setPharmacies(response.data);
       } catch (error) {
         console.error('Erreur lors du chargement des pharmacies:', error);
@@ -96,7 +96,7 @@ const HomePage = () => {
 
   // Navigation vers la liste des produits
   const handleViewProducts = (pharmacyId) => {
-    navigate(`/${pharmacyId}/list-product`);
+    navigate(`/list-product/${pharmacyId}`);
   };
 
   // Navigation vers les détails de la pharmacie
@@ -108,7 +108,7 @@ const HomePage = () => {
 
   // Style de la carte
   const mapContainerStyle = {
-    height: '100vh',
+    height: '80vh ',
     width: '100%',
     position: 'relative',
   };
@@ -123,13 +123,21 @@ const HomePage = () => {
     borderRadius: '50%',
     padding: '5px',
   };
-
+  const imgUrl = [
+    "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?q=80&w=2970&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1661766456250-bbde7dd079de?q=80&w=2972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1603555501671-8f96b3fce8b5?q=80&w=2971&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  ]
+  const getRandomImageUrl = () => {
+    const randomIndex = Math.floor(Math.random() * imgUrl.length);
+    return imgUrl[randomIndex];
+  };
   return (
     <div style={{ fontFamily: 'Roboto Thin, sans-serif' }}>
       <TopBar1 />
       <div style={{ marginTop: '20px' }}></div>
       <Grid container>
-        <Grid item xs={8} style={{ position: 'relative' }}>
+        <Grid item xs={6} style={{ position: 'relative' }}>
           {userPosition ? (
             <>
               <MapContainer center={userPosition} zoom={13} style={mapContainerStyle} ref={mapRef}>
@@ -168,13 +176,71 @@ const HomePage = () => {
           )}
         </Grid>
 
-        <Grid item xs={4} style={{ padding: '10px' }}>
+        <Grid item xs={6} style={{ padding: '10px' }}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/all-pharmacies')}
+            style={{marginBottom: '16px', fontSize: '12px'}}
+          >
+            Toutes les pharmacies
+          </Button>
           {pharmacies.map((pharmacy, index) => (
-            <Card key={index} style={{ marginBottom: '10px' }}>
-              <CardContent>
-                <Typography variant="h6">{pharmacy.name}</Typography>
-                <Typography variant="body2">{pharmacy.address}</Typography>
-                <Typography variant="body2">{pharmacy.phone}</Typography>
+            <Box 
+            key={index} 
+            style={{ 
+              marginBottom: '20px', 
+              backgroundColor: '#f5f5f5', 
+              borderRadius: '10px',
+              display: 'flex',
+              padding: '0px', // Removed padding for full-height image alignment
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              height: '150px',  // Adjust the height as needed
+              overflow: 'hidden' // Ensures content stays within the card boundaries
+            }}
+          >
+            {/* Left section - Add an image or icon for the pharmacy */}
+            <Box style={{ 
+              flexShrink: 0, 
+              height: '100%', 
+              overflow: 'hidden', 
+              borderRadius: '10px 0 0 10px'  // Rounded corners on the left side only
+            }}>
+              {/* Example image */}
+              <img 
+                src={getRandomImageUrl()}
+                alt="Pharmacy" 
+                style={{ 
+                  width: 'auto', 
+                  height: '100%', 
+                  objectFit: 'cover'  // Ensure the image covers the box without distortion
+                }} 
+              />
+            </Box>
+            
+            {/* Right section - Pharmacy details */}
+            <CardContent 
+              style={{ 
+                padding: '20px', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                justifyContent: 'center', 
+                flexGrow: 1, 
+                overflow: 'hidden' 
+              }}
+            >
+              <Typography variant="h6" style={{ fontWeight: 600 }}>{pharmacy.name}</Typography>
+              <Typography variant="body2" style={{ color: '#555' }}>{pharmacy.address}</Typography>
+              <Typography variant="body2" style={{ color: '#555' }}>{pharmacy.phone}</Typography>
+              
+              <Box style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleViewProducts(pharmacy._id)}
+                  style={{ marginRight: '10px', textTransform: 'none' }}
+                >
+                  Voir tous les produits
+                </Button>
                 <IconButton
                   aria-label="more"
                   aria-controls={`menu-${index}`}
@@ -183,19 +249,21 @@ const HomePage = () => {
                 >
                   <MoreVertIcon />
                 </IconButton>
-                <Menu
-                  id={`menu-${index}`}
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl) && selectedPharmacy === pharmacy}
-                  onClose={handleMenuClose}
-                >
-                  <MenuItem onClick={() => handleViewProducts(pharmacy._id)}>Voir tous les produits</MenuItem>
-                  <MenuItem onClick={handleViewDetails}>Afficher les détails</MenuItem>
-                </Menu>
-              </CardContent>
-            </Card>
+              </Box>
+              
+              <Menu
+                id={`menu-${index}`}
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl) && selectedPharmacy === pharmacy}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={handleViewDetails}>Afficher les détails</MenuItem>
+              </Menu>
+            </CardContent>
+          </Box>
           ))}
+          
         </Grid>
       </Grid>
     </div>

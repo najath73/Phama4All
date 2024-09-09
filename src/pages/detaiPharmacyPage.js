@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, Grid, Divider, Avatar } from '@mui/material';
+import { Card, Typography, Grid, Divider, Avatar } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { styled } from '@mui/material/styles';

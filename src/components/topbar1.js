@@ -52,12 +52,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const TopBar1 = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [searchOpen, setSearchOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const toggleSearch = () => {
@@ -67,7 +67,7 @@ const TopBar1 = () => {
   return (
     <>
       {/* Première petite barre verte */}
-      <AppBar position="static" style={{ backgroundColor: '#00684A', height: '30px' }}>
+      <AppBar position="static" style={{ backgroundColor: '#004d40', height: '30px' }}>
         <Toolbar>
           <Typography variant="caption" style={{ flexGrow: 1, textAlign: 'center', color: '#fff' }}>
           </Typography>
@@ -79,28 +79,29 @@ const TopBar1 = () => {
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           {/* Logo */}
           <Typography variant="h6" noWrap component="div" sx={{ color: '#000' }}>
-          <div
-            onClick={() => navigate('/')}
-            style={{
+            <div
+              onClick={() => navigate('/')}
+              style={{
                 fontFamily: "'Poppins', sans-serif",
                 fontSize: '24px',
                 letterSpacing: '0.05em',
                 display: 'flex',
                 alignItems: 'center',
                 cursor: 'pointer'
-            }}
+              }}
             >
-            
-            <span style={{ fontWeight: 400, color: '#10A760', marginLeft: '8px' }}>Pharma</span>
-            <span style={{ fontWeight: 700, color: '#000' }}>4All</span>
+              <span style={{ fontWeight: 400, color: '#10A760', marginLeft: '8px' }}>Pharma</span>
+              <span style={{ fontWeight: 700, color: '#000' }}>4All</span>
             </div>
           </Typography>
 
           {/* Barre de recherche */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton onClick={toggleSearch}>
-              <SearchIcon style={{ color: '#000' }} />
-            </IconButton>
+            {!searchOpen && ( // Hide the search icon when the search is open
+              <IconButton onClick={toggleSearch}>
+                <SearchIcon style={{ color: '#000' }} />
+              </IconButton>
+            )}
             {searchOpen && (
               <Search>
                 <SearchIconWrapper>
@@ -113,58 +114,67 @@ const TopBar1 = () => {
               </Search>
             )}
           </div>
-
-          {/* Menus */}
           <Button
-            color="inherit"
-            onClick={() => navigate('/all-pharmacies')}
-            sx={{
-              color: '#000',
-              '&:hover': {
-                color: '#A0D6B4', // Change en vert mousse au survol
-              },
-            }}
-          >
-            Toutes les pharmacies
-          </Button>
-          <Button
-            color="inherit"
             onClick={() => navigate('/user-orders')}
             sx={{
-              color: '#000',
-              '&:hover': {
-                color: '#A0D6B4', // Change en vert mousse au survol
-              },
-            }}
-          >
-            Mes commandes
-          </Button>
-
-          <Button
-            onClick={handleLogout}
-            sx={{
+              fontSize: 12,
+              fontWeight: 600,
               color: '#000',
               backgroundColor: 'transparent',
-              '&:hover': {
-                color: '#555',
-                backgroundColor: 'transparent',
-              },
             }}
           >
-            Déconnexion
+            Les produits
           </Button>
-
-          {/* Icône utilisateur */}
-          <IconButton
-            size="large"
-            style={{ color: '#000' }}
-            onClick={() => navigate(`/users/:id`)}
-          >
-            <AccountCircle />
-          </IconButton>
-
-          {/* Bouton déconnexion */}
-          
+          {/* Menus */}
+          {user && (
+            <>
+              <Button
+                onClick={() => navigate('/user-orders')}
+                sx={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#000',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                Mes commandes
+              </Button>
+              <Button
+                onClick={handleLogout}
+                sx={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#000',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                Déconnexion
+              </Button>
+              {/* Icône utilisateur */}
+              <IconButton
+                size="large"
+                style={{ color: '#000' }}
+                onClick={() => navigate(`/users/:id`)}
+              >
+                <AccountCircle />
+              </IconButton>
+            </>
+          )}
+          {!user && (
+            <Button
+              onClick={() => navigate("/login")}
+              sx={{
+                color: '#000',
+                backgroundColor: 'transparent',
+                '&:hover': {
+                  color: '#555',
+                  backgroundColor: 'transparent',
+                },
+              }}
+            >
+              Connexion
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
     </>

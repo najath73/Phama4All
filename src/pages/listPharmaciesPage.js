@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Card, CardContent, Typography, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import axios from 'axios';
 import TopBar1 from '../components/topbar1';
+import api from '../utils/api';
 
 const AllPharmacies = () => {
   const [pharmacies, setPharmacies] = useState([]);
@@ -12,7 +12,7 @@ const AllPharmacies = () => {
   useEffect(() => {
     const fetchPharmacies = async () => {
       try {
-        const response = await axios.get('https://back-pharmacie.onrender.com/pharmacies');
+        const response = await api.get('/pharmacies');
         setPharmacies(response.data);
       } catch (error) {
         console.error('Erreur lors du chargement des pharmacies:', error);

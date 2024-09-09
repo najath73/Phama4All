@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import TopBar1 from '../components/topbar1';
 import api from '../utils/api';
 import { useAuth } from '../hooks/authContext';
+import { useNavigate } from 'react-router-dom';
 
 const PharmacyProducts = () => {
   const { id } = useParams();  // Récupère l'ID de la pharmacie depuis l'URL
@@ -12,7 +13,7 @@ const PharmacyProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState(null); // Produit sélectionné pour la commande
   const [quantity, setQuantity] = useState(1);  // Quantité par défaut
   const { user } = useAuth(); // Récupération de l'utilisateur connecté
-
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,8 +33,7 @@ const PharmacyProducts = () => {
     console.log(product)
     setSelectedProduct(product);
     setOpen(true);
-    console.log(selectedProduct._id)
-    console.log(product._id)
+    console.log(selectedProduct)
   };
 
   // Fermer la modal
@@ -48,11 +48,12 @@ const PharmacyProducts = () => {
         pharmacy_id: id,
         producstInOrder: [
           {
-            product: selectedProduct.product._id,
+            product: selectedProduct.product.id,
             quantity: quantity,
           }
         ]
       };
+      console.log(selectedProduct.product.id)
       console.log(orderData)
       const { token } = user
       // Envoyer les données de commande à l'API
@@ -62,6 +63,8 @@ const PharmacyProducts = () => {
      }});
       console.log('Commande réussie');
       handleClose();  // Fermer la modal après la commande
+      navigate("/user-orders")
+      
     } catch (error) {
       console.error('Erreur lors de la commande:', error);
     }
