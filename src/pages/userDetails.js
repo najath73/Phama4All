@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, Typography, IconButton, Grid, Avatar, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useAuth } from '../hooks/authContext';
 import TopBar1 from '../components/topbar1';
-import TopBar2 from '../components/topbar2';
 import { useNavigate } from 'react-router-dom'; // Ajout de l'import
 
 const styles = {
@@ -48,7 +47,6 @@ const UserDetailPage = () => {
   return (
     <div style={{ fontFamily: 'Roboto Thin, sans-serif', backgroundColor: '#F0F4F7', minHeight: '100vh' }}>
       <TopBar1 />
-      <TopBar2 />
       <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
         <Grid item xs={12} sm={8} md={6}>
           <Card style={styles.card}>

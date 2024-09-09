@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import PharmacyIcon from '@mui/icons-material/LocalPharmacy';
 import TopBar1 from '../components/topbar1';
-import TopBar2 from '../components/topbar2';
 
 // Style pour le Card contenant les détails de la pharmacie
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -56,7 +55,6 @@ const PharmacyDetailPage = () => {
     <div style={{ fontFamily: 'Roboto Thin, sans-serif', backgroundColor: '#F5F5F5', minHeight: '100vh' }}>
       {/* TopBars */}
       <TopBar1 />
-      <TopBar2 />
 
       <Grid container justifyContent="center" style={{ marginTop: '20px', padding: '20px' }}>
         <StyledCard>

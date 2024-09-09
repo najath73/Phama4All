@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Chip } from '@mui/material';
 import TopBar1 from '../components/topbar1';
-import TopBar2 from '../components/topbar2';
 import { useAuth } from '../hooks/authContext'; 
 import api from '../utils/api';
 
@@ -62,7 +61,6 @@ const OrdersList = () => {
     <div>
       {/* Premier et deuxième TopBar */}
       <TopBar1 />
-      <TopBar2 />
 
       {/* Liste des commandes de l'utilisateur connecté */}
       <Grid container spacing={3} style={{ marginTop: '20px', padding: '10px' }}>

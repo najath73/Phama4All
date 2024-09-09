@@ -3,7 +3,6 @@ import { Grid, Card, CardContent, Typography, IconButton, Menu, MenuItem } from 
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import axios from 'axios';
 import TopBar1 from '../components/topbar1';
-import TopBar2 from '../components/topbar2';
 
 const AllPharmacies = () => {
   const [pharmacies, setPharmacies] = useState([]);
@@ -49,7 +48,7 @@ const AllPharmacies = () => {
     <div style={{ fontFamily: 'Roboto Thin, sans-serif', backgroundColor: '#F0F4F7', minHeight: '100vh' }}>
       {/* TopBars */}
       <TopBar1 />
-      <TopBar2 />
+      
 
       {/* Contenu des pharmacies */}
       <Grid container spacing={2} style={{ padding: '20px' }}>

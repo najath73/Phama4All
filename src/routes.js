@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Routes} from 'react-router-dom';
-
+import PrivateRoute from './components/privateRoute'
 import HomePage from './pages/homePage';
 import AllPharmacies from './pages/listPharmaciesPage'
 import PharmacyProducts from './pages/productInpharmacyPage'
@@ -24,7 +24,7 @@ const AppRoutes = ()=> {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/users/:id" element={<UserDetailPage />} />
       <Route path="/pharmacy/:id" element={<PharmacyDetailPage />} />
-      <Route path="/user-orders" element={<OrdersList />} />
+      <Route path="/user-orders" element= {<PrivateRoute element={<OrdersList/>}/>} />
       <Route path="/update-user/:id" element={<UpdateUser />} />
 
 

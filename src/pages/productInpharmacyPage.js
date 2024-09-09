@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import TopBar1 from '../components/topbar1';
-import TopBar2 from '../components/topbar2';
+import api from '../utils/api';
+import { useAuth } from '../hooks/authContext';
 
 const PharmacyProducts = () => {
   const { id } = useParams();  // Récupère l'ID de la pharmacie depuis l'URL
@@ -11,11 +11,13 @@ const PharmacyProducts = () => {
   const [open, setOpen] = useState(false);  // État pour ouvrir/fermer la modal
   const [selectedProduct, setSelectedProduct] = useState(null); // Produit sélectionné pour la commande
   const [quantity, setQuantity] = useState(1);  // Quantité par défaut
+  const { user } = useAuth(); // Récupération de l'utilisateur connecté
+
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`https://back-pharmacie.onrender.com/pharmacies/${id}/products`);
+        const response = await api.get(`/pharmacies/${id}/products`);
         setProducts(response.data);
       } catch (error) {
         console.error('Erreur lors du chargement des produits:', error);
@@ -27,8 +29,11 @@ const PharmacyProducts = () => {
 
   // Ouvrir la modal et définir le produit sélectionné
   const handleOpen = (product) => {
+    console.log(product)
     setSelectedProduct(product);
     setOpen(true);
+    console.log(selectedProduct._id)
+    console.log(product._id)
   };
 
   // Fermer la modal
@@ -48,8 +53,13 @@ const PharmacyProducts = () => {
           }
         ]
       };
+      console.log(orderData)
+      const { token } = user
       // Envoyer les données de commande à l'API
-      await axios.post(`https://back-pharmacie.onrender.com/orders`, orderData);
+      await api.post(`/orders`, orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+     }});
       console.log('Commande réussie');
       handleClose();  // Fermer la modal après la commande
     } catch (error) {
@@ -61,7 +71,6 @@ const PharmacyProducts = () => {
     <div>
       {/* Premier et deuxième TopBar */}
       <TopBar1 />
-      <TopBar2 />
 
       {/* Affichage des produits de la pharmacie */}
       <Grid container style={{ marginTop: '20px', padding: '10px' }} spacing={3}>

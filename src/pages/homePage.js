@@ -6,7 +6,6 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
 import TopBar1 from '../components/topbar1';
-import TopBar2 from '../components/topbar2';
 import axios from 'axios';
 import L from 'leaflet';
 import userIconImage from '../placeholder.png'; // Remplacez par le chemin réel de l'image de l'icône utilisateur
@@ -128,7 +127,6 @@ const HomePage = () => {
   return (
     <div style={{ fontFamily: 'Roboto Thin, sans-serif' }}>
       <TopBar1 />
-      <TopBar2 />
       <div style={{ marginTop: '20px' }}></div>
       <Grid container>
         <Grid item xs={8} style={{ position: 'relative' }}>
