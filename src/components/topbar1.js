@@ -121,6 +121,10 @@ const TopBar1 = () => {
               fontWeight: 600,
               color: '#000',
               backgroundColor: 'transparent',
+              '&:hover': {
+                color: '#004d40',
+                backgroundColor: 'transparent',
+              },
             }}
           >
             Les produits
@@ -135,6 +139,10 @@ const TopBar1 = () => {
                   fontWeight: 600,
                   color: '#000',
                   backgroundColor: 'transparent',
+                  '&:hover': {
+                    color: '#004d40',
+                    backgroundColor: 'transparent',
+                  },
                 }}
               >
                 Mes commandes
@@ -146,6 +154,10 @@ const TopBar1 = () => {
                   fontWeight: 600,
                   color: '#000',
                   backgroundColor: 'transparent',
+                  '&:hover': {
+                    color: '#004d40',
+                    backgroundColor: 'transparent',
+                  }
                 }}
               >
                 Déconnexion
@@ -164,10 +176,12 @@ const TopBar1 = () => {
             <Button
               onClick={() => navigate("/login")}
               sx={{
+                fontSize: 12,
+                fontWeight: 600,
                 color: '#000',
                 backgroundColor: 'transparent',
                 '&:hover': {
-                  color: '#555',
+                  color: '#004d40',
                   backgroundColor: 'transparent',
                 },
               }}
