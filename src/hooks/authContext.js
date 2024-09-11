@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import api from '../utils/api'; // Importer ton instance Axios
-
+import { AuthorizationError } from '../utils/errors'; // Import de l'erreur personnalisée
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -44,7 +44,12 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
-      const { access_token } = response.data;
+      const { access_token, role } = response.data;
+
+
+      if(role !== "simple_user"){
+        throw new AuthorizationError("Accès refusé : l'utilisateur n'a pas la permission.");
+      }
       
       // Enregistrer le token dans le localStorage
       localStorage.setItem('token', access_token);
@@ -55,8 +60,13 @@ export const AuthProvider = ({ children }) => {
 
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de l'authentification:", error);
-      throw error;
+      if (error.response && error.response.status === 401) {
+        throw new Error('Mot de passe incorrect. Veuillez vérifier vos informations.');
+      } else if (error instanceof AuthorizationError){
+        throw error
+      } else {
+        throw new Error('Erreur lors de la connexion. Veuillez vérifier vos informations.');
+      }
     }
   };
 
