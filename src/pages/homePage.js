@@ -16,6 +16,8 @@ const HomePage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedPharmacy, setSelectedPharmacy] = useState(null);
   const [userPosition, setUserPosition] = useState(null);
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
   const mapRef = useRef(null);
   const navigate = useNavigate();
 
@@ -45,6 +47,14 @@ const HomePage = () => {
     );
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 600);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const userIcon = L.divIcon({
     className: 'custom-user-icon',
     html: `
@@ -72,12 +82,6 @@ const HomePage = () => {
       popupAnchor: [0, -38],
     });
 
-  const handleCenterOnUser = () => {
-    if (userPosition && mapRef.current) {
-      mapRef.current.flyTo(userPosition, 13);
-    }
-  };
-
   const handleMenuOpen = (event, pharmacy) => {
     setAnchorEl(event.currentTarget);
     setSelectedPharmacy(pharmacy);
@@ -98,8 +102,12 @@ const HomePage = () => {
     }
   };
 
+  const toggleMapSize = () => {
+    setIsMapExpanded(!isMapExpanded);
+  };
+
   const mapContainerStyle = {
-    height: '80vh',
+    height: isMapExpanded ? '70vh' : isMobile ? '30vh' : '80vh',
     width: '100%',
     position: 'relative',
   };
@@ -125,6 +133,12 @@ const HomePage = () => {
     return imgUrl[randomIndex];
   };
 
+  const handleCenterOnUser = () => {
+    if (userPosition && mapRef.current) {
+      mapRef.current.flyTo(userPosition, 13);
+    }
+  };
+
   return (
     <div style={{ fontFamily: 'Roboto Thin, sans-serif' }}>
       <TopBar1 />
@@ -134,7 +148,13 @@ const HomePage = () => {
         <Grid item xs={12} md={6} style={{ position: 'relative' }}>
           {userPosition ? (
             <>
-              <MapContainer center={userPosition} zoom={13} style={mapContainerStyle} ref={mapRef}>
+              <MapContainer
+                center={userPosition}
+                zoom={13}
+                style={mapContainerStyle}
+                ref={mapRef}
+                dragging={!isMobile || isMapExpanded} // Désactiver le drag sur mobile sauf si la carte est agrandie
+              >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution="&copy; OpenStreetMap contributors"
@@ -162,6 +182,23 @@ const HomePage = () => {
               >
                 <MyLocationIcon />
               </IconButton>
+              <Button
+                variant="outlined"
+                onClick={toggleMapSize}
+                style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 1000,
+                  backgroundColor: 'white',
+                  fontSize: 12,
+                  borderColor: '#9e9e9e', // Couleur de contour des boutons
+                  color: '#9e9e9e', // Couleur du texte des boutons
+                }}
+              >
+                {isMapExpanded ? 'Réduire la carte' : 'Agrandir la carte'}
+              </Button>
             </>
           ) : (
             <p>Chargement de votre position...</p>
@@ -170,13 +207,25 @@ const HomePage = () => {
 
         {/* Affichage des cards */}
         <Grid item xs={12} md={6} style={{ padding: '10px' }}>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/all-pharmacies')}
-            style={{ marginBottom: '16px', fontSize: '12px' }}
+          <Box
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '16px',
+            }}
           >
-            Toutes les pharmacies
-          </Button>
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/all-pharmacies')}
+              style={{
+                fontSize: 12,
+                borderColor: '#9e9e9e', // Couleur de contour des boutons
+                color: '#9e9e9e', // Couleur du texte des boutons
+              }}
+            >
+              Toutes les pharmacies
+            </Button>
+          </Box>
           {pharmacies.map((pharmacy, index) => (
             <Box 
               key={index} 
@@ -185,38 +234,40 @@ const HomePage = () => {
                 backgroundColor: '#f5f5f5', 
                 borderRadius: '10px',
                 display: 'flex',
-                flexDirection: 'row',  // Ensure flex layout for alignment
+                flexDirection: 'row',
                 padding: '0px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                 height: '150px',
-                overflow: 'hidden'
+                overflow: 'hidden',
               }}
             >
-              <Box style={{ 
-                flexShrink: 0, 
-                height: '100%', 
-                overflow: 'hidden', 
-                borderRadius: '10px 0 0 10px'
-              }}>
-                <img 
+              <Box
+                style={{
+                  flexShrink: 0,
+                  height: '100%',
+                  overflow: 'hidden',
+                  borderRadius: '10px 0 0 10px',
+                }}
+              >
+                <img
                   src={getRandomImageUrl()}
-                  alt="Pharmacy" 
-                  style={{ 
-                    width: 'auto', 
-                    height: '100%', 
-                    objectFit: 'cover'
-                  }} 
+                  alt="Pharmacy"
+                  style={{
+                    width: 'auto',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
                 />
               </Box>
 
-              <CardContent 
-                style={{ 
-                  padding: '20px', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  justifyContent: 'center', 
-                  flexGrow: 1, 
-                  overflow: 'hidden' 
+              <CardContent
+                style={{
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  flexGrow: 1,
+                  overflow: 'hidden',
                 }}
               >
                 <Typography variant="h6" style={{ fontWeight: 600 }}>{pharmacy.name}</Typography>
@@ -228,7 +279,7 @@ const HomePage = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => handleViewProducts(pharmacy._id)}
-                    style={{ marginRight: '10px', textTransform: 'none' }}
+                    style={{ marginRight: '10px', textTransform: 'none', borderColor: '#9e9e9e' }}
                   >
                     Voir tous les produits
                   </Button>

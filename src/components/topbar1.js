@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Button, InputBase } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Button, InputBase, Drawer, List, ListItem, ListItemText, Divider } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import MenuIcon from '@mui/icons-material/Menu';
 import { styled, alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/authContext';
@@ -54,6 +55,7 @@ const TopBar1 = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -63,6 +65,44 @@ const TopBar1 = () => {
   const toggleSearch = () => {
     setSearchOpen(!searchOpen);
   };
+
+  const toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setDrawerOpen(open);
+  };
+
+  const drawerItems = (
+    <div
+      role="presentation"
+      onClick={toggleDrawer(false)}
+      onKeyDown={toggleDrawer(false)}
+      style={{ width: 250 }}
+    >
+      <List>
+        <ListItem button onClick={() => navigate('/user-orders')}>
+          <ListItemText primary="Les produits" />
+        </ListItem>
+        {user && (
+          <>
+            <ListItem button onClick={() => navigate('/user-orders')}>
+              <ListItemText primary="Mes commandes" />
+            </ListItem>
+            <ListItem button onClick={handleLogout}>
+              <ListItemText primary="Déconnexion" />
+            </ListItem>
+          </>
+        )}
+        {!user && (
+          <ListItem button onClick={() => navigate('/login')}>
+            <ListItemText primary="Connexion" />
+          </ListItem>
+        )}
+      </List>
+      <Divider />
+    </div>
+  );
 
   return (
     <>
@@ -97,8 +137,8 @@ const TopBar1 = () => {
 
           {/* Barre de recherche */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            {!searchOpen && ( // Hide the search icon when the search is open
-              <IconButton onClick={toggleSearch}>
+            {!searchOpen && ( // Masquer l'icône de recherche quand la barre est ouverte
+              <IconButton onClick={toggleSearch} sx={{ display: { xs: 'none', md: 'block' } }}>
                 <SearchIcon style={{ color: '#000' }} />
               </IconButton>
             )}
@@ -114,83 +154,99 @@ const TopBar1 = () => {
               </Search>
             )}
           </div>
-          <Button
-            onClick={() => navigate('/user-orders')}
-            sx={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#000',
-              backgroundColor: 'transparent',
-              '&:hover': {
-                color: '#004d40',
-                backgroundColor: 'transparent',
-              },
-            }}
-          >
-            Les produits
-          </Button>
-          {/* Menus */}
-          {user && (
-            <>
-              <Button
-                onClick={() => navigate('/user-orders')}
-                sx={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#000',
-                  backgroundColor: 'transparent',
-                  '&:hover': {
-                    color: '#004d40',
-                    backgroundColor: 'transparent',
-                  },
-                }}
-              >
-                Mes commandes
-              </Button>
-              <Button
-                onClick={handleLogout}
-                sx={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#000',
-                  backgroundColor: 'transparent',
-                  '&:hover': {
-                    color: '#004d40',
-                    backgroundColor: 'transparent',
-                  }
-                }}
-              >
-                Déconnexion
-              </Button>
-              {/* Icône utilisateur */}
-              <IconButton
-                size="large"
-                style={{ color: '#000' }}
-                onClick={() => navigate(`/users/:id`)}
-              >
-                <AccountCircle />
-              </IconButton>
-            </>
-          )}
-          {!user && (
+
+          {/* Menus pour écrans larges */}
+          <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, justifyContent: 'flex-end' }}>
             <Button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate('/user-orders')}
               sx={{
                 fontSize: 12,
                 fontWeight: 600,
                 color: '#000',
-                backgroundColor: 'transparent',
+                display: { xs: 'none', md: 'block' },
                 '&:hover': {
                   color: '#004d40',
-                  backgroundColor: 'transparent',
                 },
               }}
             >
-              Connexion
+              Les produits
             </Button>
-          )}
+
+            {user && (
+              <>
+                <Button
+                  onClick={() => navigate('/user-orders')}
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: '#000',
+                    display: { xs: 'none', md: 'block' },
+                    '&:hover': {
+                      color: '#004d40',
+                    },
+                  }}
+                >
+                  Mes commandes
+                </Button>
+                <Button
+                  onClick={handleLogout}
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: '#000',
+                    display: { xs: 'none', md: 'block' },
+                    '&:hover': {
+                      color: '#004d40',
+                    },
+                  }}
+                >
+                  Déconnexion
+                </Button>
+                {/* Icône utilisateur */}
+                <IconButton
+                  size="large"
+                  style={{ color: '#000', display: { xs: 'none', md: 'block' } }}
+                  onClick={() => navigate(`/users/:id`)}
+                >
+                  <AccountCircle />
+                </IconButton>
+              </>
+            )}
+            {!user && (
+              <Button
+                onClick={() => navigate("/login")}
+                sx={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#000',
+                  display: { xs: 'none', md: 'block' },
+                  '&:hover': {
+                    color: '#004d40',
+                  },
+                }}
+              >
+                Connexion
+              </Button>
+            )}
+
+            {/* Menu hamburger pour mobile */}
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ display: { xs: 'block', md: 'none' } }}
+              onClick={toggleDrawer(true)}
+            >
+              <MenuIcon style={{ color: '#000' }} />
+            </IconButton>
+          </div>
         </Toolbar>
       </AppBar>
+
+      {/* Drawer pour mobile */}
+      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+        {drawerItems}
+      </Drawer>
     </>
   );
 };
