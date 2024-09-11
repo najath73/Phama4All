@@ -16,7 +16,6 @@ const HomePage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedPharmacy, setSelectedPharmacy] = useState(null);
   const [userPosition, setUserPosition] = useState(null);
-  const [isMapExpanded, setIsMapExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
   const mapRef = useRef(null);
   const navigate = useNavigate();
@@ -102,12 +101,14 @@ const HomePage = () => {
     }
   };
 
-  const toggleMapSize = () => {
-    setIsMapExpanded(!isMapExpanded);
+  const handleCenterOnUser = () => {
+    if (userPosition && mapRef.current) {
+      mapRef.current.flyTo(userPosition, 13);
+    }
   };
 
   const mapContainerStyle = {
-    height: isMapExpanded ? '70vh' : isMobile ? '30vh' : '80vh',
+    height: isMobile ? '40vh' : '80vh',
     width: '100%',
     position: 'relative',
   };
@@ -133,18 +134,11 @@ const HomePage = () => {
     return imgUrl[randomIndex];
   };
 
-  const handleCenterOnUser = () => {
-    if (userPosition && mapRef.current) {
-      mapRef.current.flyTo(userPosition, 13);
-    }
-  };
-
   return (
     <div style={{ fontFamily: 'Roboto Thin, sans-serif' }}>
       <TopBar1 />
       <div style={{ marginTop: '20px' }}></div>
       <Grid container spacing={2}>
-        {/* Ajustement de la largeur de la carte pour les petits écrans */}
         <Grid item xs={12} md={6} style={{ position: 'relative' }}>
           {userPosition ? (
             <>
@@ -153,7 +147,7 @@ const HomePage = () => {
                 zoom={13}
                 style={mapContainerStyle}
                 ref={mapRef}
-                dragging={!isMobile || isMapExpanded} // Désactiver le drag sur mobile sauf si la carte est agrandie
+                dragging={!isMobile}
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -182,30 +176,12 @@ const HomePage = () => {
               >
                 <MyLocationIcon />
               </IconButton>
-              <Button
-                variant="outlined"
-                onClick={toggleMapSize}
-                style={{
-                  position: 'absolute',
-                  bottom: '10px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  zIndex: 1000,
-                  backgroundColor: 'white',
-                  fontSize: 12,
-                  borderColor: '#9e9e9e', // Couleur de contour des boutons
-                  color: '#9e9e9e', // Couleur du texte des boutons
-                }}
-              >
-                {isMapExpanded ? 'Réduire la carte' : 'Agrandir la carte'}
-              </Button>
             </>
           ) : (
             <p>Chargement de votre position...</p>
           )}
         </Grid>
 
-        {/* Affichage des cards */}
         <Grid item xs={12} md={6} style={{ padding: '10px' }}>
           <Box
             style={{
@@ -215,45 +191,47 @@ const HomePage = () => {
             }}
           >
             <Button
-              variant="outlined"
               onClick={() => navigate('/all-pharmacies')}
+              variant="outlined"
               style={{
-                fontSize: 12,
-                borderColor: '#9e9e9e', // Couleur de contour des boutons
-                color: '#9e9e9e', // Couleur du texte des boutons
+                borderColor: '#9e9e9e',
+                color: '#9e9e9e',
+                textTransform: 'none',
               }}
             >
               Toutes les pharmacies
             </Button>
           </Box>
           {pharmacies.map((pharmacy, index) => (
-            <Box 
-              key={index} 
-              style={{ 
-                marginBottom: '20px', 
-                backgroundColor: '#f5f5f5', 
+            <Box
+              key={index}
+              style={{
+                marginBottom: '20px',
+                backgroundColor: '#f5f5f5',
                 borderRadius: '10px',
                 display: 'flex',
                 flexDirection: 'row',
                 padding: '0px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                height: '150px',
+                height: 'auto',
                 overflow: 'hidden',
+                width: '100%',
               }}
             >
               <Box
                 style={{
                   flexShrink: 0,
-                  height: '100%',
+                  height: '120px',
                   overflow: 'hidden',
                   borderRadius: '10px 0 0 10px',
+                  width: '120px',
                 }}
               >
                 <img
                   src={getRandomImageUrl()}
                   alt="Pharmacy"
                   style={{
-                    width: 'auto',
+                    width: '100%',
                     height: '100%',
                     objectFit: 'cover',
                   }}
@@ -262,7 +240,7 @@ const HomePage = () => {
 
               <CardContent
                 style={{
-                  padding: '20px',
+                  padding: '10px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
@@ -270,16 +248,57 @@ const HomePage = () => {
                   overflow: 'hidden',
                 }}
               >
-                <Typography variant="h6" style={{ fontWeight: 600 }}>{pharmacy.name}</Typography>
-                <Typography variant="body2" style={{ color: '#555' }}>{pharmacy.address}</Typography>
-                <Typography variant="body2" style={{ color: '#555' }}>{pharmacy.phone}</Typography>
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {pharmacy.name}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  style={{
+                    color: '#555',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {pharmacy.address}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  style={{
+                    color: '#555',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {pharmacy.phone}
+                </Typography>
 
-                <Box style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+                <Box
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginTop: '10px',
+                  }}
+                >
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => handleViewProducts(pharmacy._id)}
-                    style={{ marginRight: '10px', textTransform: 'none', borderColor: '#9e9e9e' }}
+                    style={{
+                      marginRight: '10px',
+                      textTransform: 'none',
+                      borderColor: '#9e9e9e',
+                    }}
                   >
                     Voir tous les produits
                   </Button>
